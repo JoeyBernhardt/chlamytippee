@@ -1,0 +1,16 @@
+Number,CC Strain name,Notes
+1,CC-407 wild type mt+,Appears to be yellow in the dark. 
+2,CC-125 wild type mt+ [137c],CC-125 carries the AGG1 (agg1+) allele for phototactic aggregation
+3,CC-2343 wild type mt+ ,
+4,CC-1081 mt+,
+5,CC-3060 Quebec isolate F94-7 mt+,Infertile with lab strain of C. reinhardtii.
+6,CC-1374,Presumed European origin
+7,CC-2932 wild type mt+,From soil in North Carolina
+8,CC-4414 wild type mt+ DN2,Isolated from high altitude in Colorado and can grow at 4 degrees celsius.
+9,CC-1373 C. smithii mt+,Can mate with C. reinhardtii. Faulty cell lysis makes growth clumpy.
+10,CC-1092 wild type mt+ ,"May be equivalent to CC-1690, the strain I have and used in the evolution experiement. "
+11,CC-503 cw92 mt+ ,Cell wall deficient natural mutant. Strain used for DNA isolation for genomic sequencing. 
+12,cdka-1-mt+,"temperature sensitive mutant strain, recommended by Matt Laudon"
+13,cc-3980-vhlr-l33,"Phenotype: can grow at very high light intensity. This is a spontaneous mutant selected for ability to grow and remain green at very high light intensity (1500-2000 micromole photons per square meter per second). The background strain was the herbicide-resistant mutant psbA-A251L*, obtained from a cross of strain CC-3389 to wild-type CC-124. Please see CC-3389 for more information on the A251L mutation."
+14,CC-4430 hsp22 mt+,"This strain has a deletion of two HSP22 heat shock proteins, and was originally isolated as a mutant requiring high CO2, designated HCR3510 or HSP3510. It has been suggested that the two HSP proteins deleted here might be involved in photoprotection."
+15,CC-1629 Howell ts 10009 mt+,"Phenotype: temperature sensitive, cannot grow at 33 degrees. This is a mutant with a temperature-conditional cell cycle block, isolated in the 137c background."
