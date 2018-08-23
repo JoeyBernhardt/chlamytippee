@@ -1,0 +1,2 @@
+ 	Area	Mean	XM	YM	Perim.	Major	Minor	Angle
+1	14	255	527.357	814.929	14.485	5.977	2.982	80.990
