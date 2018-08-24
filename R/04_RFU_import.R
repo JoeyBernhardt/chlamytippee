@@ -2,7 +2,15 @@
 
 library(tidyverse)
 library(readxl)
+library(plater)
+library(stringr)
 
+dilutions <- read_excel("data/dilutions-aug-21-2018.xlsx") %>% 
+	clean_names()
+
+plate_pilot <- read_plate(file = "data-processed/plate_pilot_aug21.csv", well_ids_column = "well") %>% 
+	rename(population_density = row) %>% 
+	mutate(well = str_replace(well, "0", ""))
 
 plate1 <- read_excel("data/RFU-2018-08-23-2shakes/plate1.xlsx", skip = 47) %>% 
 	select(-X__2) %>% 
@@ -68,14 +76,24 @@ plate5df <- read_plate(file = "data-processed/plate5-CT-pilot-day2.csv", well_id
 all_RFUs <- bind_rows(plate1df, plate2df, plate3df, plate4df, plate5df)
 
 RFU_all <- left_join(all_RFUs, plate_pilot, by = "well")
-RFU_all2 <- left_join(RFU_all, dilutions, by = "population_density")
+RFU_all2 <- left_join(RFU_all, dilutions, by = "population_density") %>% 
+	mutate(light_photons = light/100*700)
 
 RFU_all2 %>% 
 	ggplot(aes(x = percent_of_stock, y = RFU)) + geom_point() +
 	facet_wrap( ~ light)
 
-ggplot(data = RFU_all2, aes(x=percent_of_stock, y=light, fill=RFU)) + 
-	geom_tile(size = 4)
+ggplot(data = RFU_all2, aes(x=light_photons, y=percent_of_stock, color = RFU)) + 
+	geom_point(shape = 15, size = 10) + scale_color_viridis_c() +
+	ylab("Population density") + xlab("Irradiance (umol/m2/s)")
+ggsave("figures/RFU-day-2-heatmap.pdf", width = 5, height = 4)
+
+RFU_all2 %>% 
+	ggplot(aes(x = light_photons, y = RFU)) + geom_point(size = 3) +
+	facet_wrap( ~ percent_of_stock, scales = "free") + xlab("Irradiance (umol/m2/s)") +ggtitle("RFU-Irradiance plots at different starting population densities")
+ggsave("figures/RFU-irradiance-day-2.pdf", width = 8, height = 6)
+# alternative import ------------------------------------------------------
+
 
 
 RFU_files <- c(list.files("data/RFU-2018-08-23-2shakes", full.names = TRUE))
