@@ -187,7 +187,9 @@ ggsave("figures/RFU-irradiance-day-2-4.pdf", width = 10, height = 6)
 
 RFU_all2 %>% 
 	spread(key = date, value = RFU) %>% 
-	mutate(delta_RFU = (`2018-08-25`-`2018-08-23`)/ `2018-08-23`)%>% 
+	mutate(delta_RFU = (`2018-08-25`-`2018-08-23`)/ `2018-08-23`)%>%
+	group_by(light_photons, percent_of_stock) %>% 
+	summarise_each(funs(mean), delta_RFU) %>% 
 	mutate(growth_rate = ifelse(delta_RFU > 0, "positive", "negative")) %>% 
 	ggplot(aes(x=light_photons, y=percent_of_stock, color = growth_rate)) + 
 	geom_point(shape = 15, size = 10) + 
