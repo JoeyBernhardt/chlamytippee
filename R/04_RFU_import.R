@@ -195,6 +195,7 @@ RFU_all2 %>%
 	# scale_color_gradient2(low = "blue", high = "red", mid = "white", 
 				# midpoint = 0, space = "Lab") +
 	ylab("Population density") + xlab("Irradiance (umol/m2/s)")
+ggsave("figures/RFU-heatmap-growth-rate.pdf", width = 7, height = 6)
 	
 
 
