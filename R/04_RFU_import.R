@@ -7,6 +7,7 @@ library(stringr)
 library(janitor)
 library(lubridate)
 library(cowplot)
+library(broom)
 
 dilutions <- read_excel("data/dilutions-aug-21-2018.xlsx") %>% 
 	clean_names()
@@ -155,6 +156,8 @@ all_RFUs <- bind_rows(plate1df, plate2df, plate3df, plate4df, plate5df,
 RFU_all <- left_join(all_RFUs, plate_pilot, by = "well")
 RFU_all2 <- left_join(RFU_all, dilutions, by = "population_density") %>% 
 	mutate(light_photons = light/100*700)
+write_csv(RFU_all2, "data-processed/rfu-day2-4.csv")
+
 
 RFU_all2 %>% 
 	ggplot(aes(x = percent_of_stock, y = RFU, color = factor(date))) + geom_point() +
@@ -199,6 +202,43 @@ RFU_all2 %>%
 	ylab("Population density") + xlab("Irradiance (umol/m2/s)")
 ggsave("figures/RFU-heatmap-growth-rate.pdf", width = 7, height = 6)
 	
+
+slopes <- RFU_all2 %>% 
+	mutate(days = ifelse(date == "2018-08-25", 4, 2)) %>% 
+	group_by(light_photons, percent_of_stock) %>% 
+	do(tidy(lm(log(RFU+1) ~ days, data = .), conf.int = TRUE)) %>% 
+	filter(term == "days") %>% 
+	ungroup()
+
+
+slopes %>% 
+	mutate(growth_rate = ifelse(estimate > 0, "positive", "negative")) %>% 
+	ggplot(aes(x=light_photons, y=percent_of_stock, color = estimate)) + 
+	geom_point(shape = 15, size = 10) + 
+	scale_color_brewer(type = "div") +
+	scale_color_gradient2(low = "blue", high = "red", mid = "white",
+	midpoint = 0, space = "Lab", name = "Growth rate") +
+	ylab("Population density") + xlab("Irradiance (umol/m2/s)")
+ggsave("figures/RFU-growth-heatmap.pdf", width = 7, height = 4)
+
+slopes %>% 
+	mutate(growth_rate = ifelse(estimate > 0, "positive", "negative")) %>% 
+	ggplot(aes(x=light_photons, y=percent_of_stock, color = growth_rate)) + 
+	geom_point(shape = 15, size = 10) + 
+	# scale_color_brewer(type = "div") +
+	# scale_color_gradient2(low = "blue", high = "red", mid = "white", 
+	# midpoint = 0, space = "Lab") +
+	ylab("Population density") + xlab("Irradiance (umol/m2/s)")
+
+
+
+
+RFU_all2 %>% 
+	mutate(days = ifelse(date == "2018-08-25", 4, 2)) %>% 
+	ggplot(aes(x = days, y = log(RFU+1))) + geom_point() +
+	facet_wrap( ~ percent_of_stock + light_photons, nrow = 8, ncol = 5) +
+	geom_smooth(method = "lm", color = "black")
+ggsave("figures/RFU_slopes.pdf", width = 10, height = 12)
 
 
 # alternative import ------------------------------------------------------

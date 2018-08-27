@@ -23,6 +23,7 @@ plate_pilot <- read_plate(file = "data-processed/plate_pilot_aug21.csv", well_id
 	rename(population_density = row) %>% 
 	mutate(well = str_replace(well, "0", ""))
 
+write_csv(plate_pilot, "data-processed/plate-pilot.csv")
 
 innocs2 <- left_join(innocs, plate_pilot, by = "well")
 

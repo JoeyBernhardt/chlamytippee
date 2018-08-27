@@ -29,3 +29,30 @@ all_cells2 <- all_cells %>%
 
 
 write_csv(all_cells2, "data-processed/pilot_innoculation_densities.csv")
+
+
+
+# Day 2 33 percent --------------------------------------------------------
+
+
+cell_files <- c(list.files("imageJ-results/2018-08-27-CT-day2-33percent-brightfield", full.names = TRUE))
+cell_files_txt <- cell_files[grepl(".txt", cell_files)]
+
+
+names(cell_files_txt) <- cell_files_txt %>% 
+	gsub(pattern = ".txt$", replacement = "")
+
+
+#### Step 3: read in all the files!
+
+all_cells <- map_df(cell_files_txt, read_tsv, col_names = TRUE, .id = "file_name")
+
+all_cells2 <- all_cells %>% 
+	rename(cell_id = X1) %>% 
+	mutate(well = file_name) %>%
+	separate(well, into = c("extra", "well"), sep = "ws_") %>% 
+	separate(well, into = c("well", "extra_photo_info"), sep = 2)
+
+
+write_csv(all_cells2, "data-processed/CT-pilot-day2-33percent.csv")
+
