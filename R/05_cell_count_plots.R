@@ -1,9 +1,15 @@
 
 library(tidyverse)
 library(plotrix)
+library(readxl)
+library(janitor)
+library(cowplot)
 
 
 day2_33perc <- read_csv("data-processed/CT-pilot-day2-33percent.csv")
+dilutions <- read_excel("data/dilutions-aug-21-2018.xlsx") %>% 
+	clean_names()
+
 
 
 plate_pilot <- read_csv("data-processed/plate-pilot.csv")
@@ -25,6 +31,12 @@ day2_summ <- day2_densities2 %>%
 	distinct(file_name, .keep_all = TRUE) %>% 
 	filter(cell_count_mean < 5000)
 
+
+day2_densities2 %>%
+	filter(cell_count > 5000) %>% 
+	ungroup() %>% 
+	distinct(well)
+
 day2_summ_2 <- left_join(day2_summ, dilutions, by = "population_density")
 
 day2_summ_2 %>% 
@@ -43,7 +55,16 @@ RFUs <- read_csv("data-processed/rfu-day2-4.csv") %>%
 rfu_densities <- left_join(day2_summ, RFUs, by = c("well", "population_density"))
 
 rfu_densities %>% 
+	filter(cell_count_mean <1000) %>% 
+	ungroup() %>% 
 	ggplot(aes(x = cell_count_mean, y = RFU, color = )) + geom_point() +
 	geom_abline(slope = 1, intercept = 0) +
-	ylab("RFU") + xlab("Cell count")
+	ylab("RFU") + xlab("Cell count") + geom_smooth(method = "lm", color = "black")
 ggsave("figures/cell_count_RFU.pdf", width = 5, height =4)
+
+library(broom)
+rfu_densities %>% 
+	filter(cell_count_mean <1000) %>% 
+	ungroup() %>% 
+	lm(RFU ~ cell_count_mean, data = .) %>% 
+	tidy(., conf.int = TRUE)
