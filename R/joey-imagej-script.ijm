@@ -9,13 +9,13 @@
 // ****************************************************************************
 
 // specify input directory
-dir_input = '/Users/joeybernhardt/Documents/chlamytippee/cell-images/converted-jpgs/'
+dir_input = '/Users/joeybernhardt/Documents/chlamytippee/cell-images/2018-08-27-CT-day2-33-percent-brightfield-jpg/'
 
 // specify directory with photos for comparison
 dir_compare = 'c:\\MEE\\Images\\2 - Photos for comparison\\'
 
 // specify output directory
-dir_output = '/Users/joeybernhardt/Documents/chlamytippee/imageJ-results/'
+dir_output = '/Users/joeybernhardt/Documents/chlamytippee/imageJ-results/2018-08-27-CT-day2-33percent-brightfield/'
 
 // specify segmentation approach (i.e. 'threshold', 'difference image' or 'edge detection')
 seg = 'threshold'

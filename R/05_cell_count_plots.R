@@ -29,7 +29,7 @@ day2_summ_2 <- left_join(day2_summ, dilutions, by = "population_density")
 
 day2_summ_2 %>% 
 	ggplot(aes(x = percent_of_stock, y = cell_count_mean)) + geom_point() +
-	geom_errorbar(aes(ymin = cell_count_mean - cell_count_std.error, ymax = cell_count_mean + cell_count_std.error), width = 0.1) +
+	geom_errorbar(aes(ymin = cell_count_mean - cell_count_std.error, ymax = cell_count_mean + cell_count_std.error), width = 0.05) +
 	ylab("Cell count") + xlab("Starting population density (percent)")
 ggsave("figures/day2-33-percent-cell-counts.pdf", width = 6, height = 5)
 
