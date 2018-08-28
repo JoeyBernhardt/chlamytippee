@@ -9,13 +9,13 @@
 // ****************************************************************************
 
 // specify input directory
-dir_input = '/Users/joeybernhardt/Documents/chlamytippee/cell-images/2018-08-27-CT-day2-33-percent-brightfield-jpg/'
+dir_input = '/Users/joeybernhardt/Documents/96-well-converted-jpgs/'
 
 // specify directory with photos for comparison
 dir_compare = 'c:\\MEE\\Images\\2 - Photos for comparison\\'
 
 // specify output directory
-dir_output = '/Users/joeybernhardt/Documents/chlamytippee/imageJ-results/2018-08-27-CT-day2-33percent-brightfield/'
+dir_output = '/Users/joeybernhardt/Documents/96-well-results/'
 
 // specify segmentation approach (i.e. 'threshold', 'difference image' or 'edge detection')
 seg = 'threshold'
@@ -24,8 +24,8 @@ seg = 'threshold'
 ws = '_ws_'; 
 
 // specify size boundaries to exclude objects that are smaller/bigger than the min_size/max_size
-min_size = 0
-max_size = 1000000000000000000000000
+min_size = 15
+max_size = 200
 
 // **************************************************************************** 
 // **                    End of USER SECTION                                 **
@@ -57,7 +57,7 @@ run("Duplicate...", "title");
   if (seg=='threshold') {
     // select global threshold to segment image
     selectWindow(list[i]);
-    setThreshold(0, 140, "black & white");
+    setThreshold(0, 160, "black & white");
     run("Convert to Mask");
     }
 
