@@ -121,6 +121,11 @@ dens_sum <- densities %>%
 	group_by(well, light_level, day) %>% 
 	summarise_each(funs(mean), cell_count) 
 
+dens_sum_m <- densities %>% 
+	group_by(well, light_level, day) %>% 
+	summarise_each(funs(mean), Count) 
+
+
 dens_sum2 <- left_join(dens_sum, plate_pilot, by = "well")
 dens_sum3 <- left_join(dens_sum2, dilutions, by = "population_density")
 
@@ -134,6 +139,24 @@ slopes <- dens_sum3 %>%
 	filter(term == "days") %>% 
 	ungroup() 
 
+dens_sum3 %>% 
+	ungroup() %>% 
+	mutate(days = ifelse(day == "day4", 4, 2)) %>% 
+	mutate(light_level = as.numeric(light_level)) %>% 
+	mutate(light_photons = 700*(light_level/100)) %>% 
+	ggplot(aes(x = days, y = log(cell_count+1))) + geom_point() +
+	facet_wrap( ~  percent_of_stock + light_photons, nrow = 8, ncol = 5,  scales = "free") + geom_smooth(method = "lm")
+ggsave("figures/pilot-cell-counts-days2-4.pdf", width = 10, height = 12)
+
+dens_sum3 %>% 
+	ungroup() %>% 
+	mutate(days = ifelse(day == "day4", 4, 2)) %>% 
+	mutate(light_level = as.numeric(light_level)) %>% 
+	mutate(light_photons = 700*(light_level/100)) %>% 
+	ggplot(aes(x = days, y = cell_count)) + geom_point() +
+	facet_wrap( ~  percent_of_stock + light_photons, nrow = 8, ncol = 5,  scales = "free") + geom_smooth(method = "lm")
+ggsave("figures/pilot-cell-counts-days2-4-linear.pdf", width = 10, height = 12)
+
 slopes %>% 
 	mutate(growth_rate = ifelse(estimate > 0, "positive", "negative")) %>% 
 	ggplot(aes(x=light_photons, y=percent_of_stock, color = estimate)) + 
@@ -142,17 +165,15 @@ slopes %>%
 	scale_color_gradient2(low = "blue", high = "red", mid = "white",
 						  midpoint = 0, space = "Lab", name = "Growth rate") +
 	ylab("Population density") + xlab("Irradiance (umol/m2/s)")
-ggsave("figures/cell-count-growth-heatmap.pdf", width = 5, height = 4)
+ggsave("figures/cell-count-growth-heatmap-zeros.pdf", width = 5, height = 4)
 
 slopes %>% 
 	mutate(growth_rate = ifelse(estimate > 0, "positive", "negative")) %>% 
 	ggplot(aes(x=light_photons, y=percent_of_stock, color = growth_rate)) + 
 	geom_point(shape = 15, size = 10) + 
-	# scale_color_brewer(type = "div") +
-	# scale_color_gradient2(low = "blue", high = "red", mid = "white", 
-	# midpoint = 0, space = "Lab") +
+	scale_color_viridis_d(begin = 0.3, end = 0.9, name = "Growth rate") +
 	ylab("Population density") + xlab("Irradiance (umol/m2/s)")
-ggsave("figures/cell-count-growth-pos-neg-heatmap.pdf", width = 5, height = 4)
+ggsave("figures/cell-count-growth-pos-neg-heatmap-zeros.pdf", width = 5, height = 4)
 
 
 
