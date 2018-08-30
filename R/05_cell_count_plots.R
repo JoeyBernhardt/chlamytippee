@@ -4,18 +4,42 @@ library(plotrix)
 library(readxl)
 library(janitor)
 library(cowplot)
+library(stringr)
+library(broom)
 
 
 day2_33perc <- read_csv("data-processed/CT-pilot-day2-33percent.csv")
 
-well_96_data <- read_csv("data-processed/CT-pilot-96-well-data.csv") %>% 
+well_96_data <- read_csv("~/Desktop/CT-pilot-96-well-data.csv") %>% 
 	filter(Area < 200) %>% 
 	mutate(day = NA) %>% 
-	mutate(day = ifelse(grepl("day2", extra2), "day2", "day4")) 
+	mutate(day = ifelse(grepl("day2", extra2), "day2", "day4"))
+
+
+well_96_data_2$photo_name[[1]]
+zero_photos$Slice[[1]]
+well_96_data_2 <- well_96_data %>% 
+	separate(file_name, into = c("file_path", "photo_name"), sep = "ws_") %>% 
+	mutate(photo_name = str_replace(photo_name, "_results", ""))
+
+
+
+# ok let’s get rid of the photos here with no cells -----------------------
+
+zero_photo_names <- zero_photos %>% 
+	filter(Count == 0) %>% 
+	select(Slice)
+
+well_96_data_3 <- well_96_data_2 %>% 
+	filter(!photo_name %in% c(zero_photo_names$Slice))
+
+
+
 dilutions <- read_excel("data/dilutions-aug-21-2018.xlsx") %>% 
 	clean_names()
 
-
+zero_photos <- read_csv("data-processed/pilot-96-well-finding-zeros.csv") %>% 
+	mutate(photo_name = Slice)
 
 plate_pilot <- read_csv("data-processed/plate-pilot.csv")
 
@@ -78,9 +102,12 @@ rfu_densities %>%
 
 # 96 well plate data ------------------------------------------------------
 
-densities <- well_96_data %>% 
+well_96_data_4 <- left_join(well_96_data_2, zero_photos, by = "photo_name") 
+
+densities <- well_96_data_4 %>% 
+	mutate(cell_id2 = ifelse(Count == 0, 0, cell_id)) %>% 
 	group_by(well, extra2, day) %>% 
-	mutate(cell_count = max(cell_id)) %>% 
+	mutate(cell_count = max(cell_id2)) %>% 
 	mutate(light_level = NA) %>% 
 	mutate(light_level = case_when(grepl("05percent", extra2) ~ "5",
 								   grepl("5percent", extra2) ~ "5",
@@ -103,7 +130,7 @@ slopes <- dens_sum3 %>%
 	mutate(light_level = as.numeric(light_level)) %>% 
 	mutate(light_photons = 700*(light_level/100)) %>% 
 	group_by(light_photons, percent_of_stock) %>% 
-	do(tidy(lm(log(cell_count) ~ days, data = .), conf.int = TRUE)) %>% 
+	do(tidy(lm(log(cell_count+1) ~ days, data = .), conf.int = TRUE)) %>% 
 	filter(term == "days") %>% 
 	ungroup() 
 
