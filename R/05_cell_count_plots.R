@@ -11,7 +11,7 @@ day2_33perc <- read_csv("data-processed/CT-pilot-day2-33percent.csv")
 well_96_data <- read_csv("data-processed/CT-pilot-96-well-data.csv") %>% 
 	filter(Area < 200) %>% 
 	mutate(day = NA) %>% 
-	mutate(day = ifelse(grepl("day2", extra2), "day2", "day4"))
+	mutate(day = ifelse(grepl("day2", extra2), "day2", "day4")) 
 dilutions <- read_excel("data/dilutions-aug-21-2018.xlsx") %>% 
 	clean_names()
 
@@ -21,7 +21,7 @@ plate_pilot <- read_csv("data-processed/plate-pilot.csv")
 
 day2_densities <- day2_33perc %>% 
 	group_by(well, extra_photo_info) %>% 
-	mutate(cell_count = max(cell_id)) 
+	mutate(cell_count = max(cell_id))
 
 
 

@@ -1,0 +1,13 @@
+for topfolder in */ ; 	do cd $topfolder ; for nextfolder in */ ; do cd $nextfolder ; for folder in *\ *; do mv "$folder" "${folder// /_}" ; done ; for newfolder in */ ; do cd $newfolder ; for file in *\ *tif ; do mv "$file" "${file// /_}" ; done ; for nospacefile in *tif ; do mv $nospacefile ${topfolder%/}_$nospacefile ; done ; done ; cd ../../.. ; done ; done
+
+
+
+
+#WTF does the % do ....
+
+if you have a file myfile.tif  you can make it myfile.dat as output by 
+
+define filename=myfile.tif
+processname <infile> <outfile>
+
+processname $filename ${filename%tif}dat

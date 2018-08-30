@@ -57,8 +57,10 @@ run("Duplicate...", "title");
   if (seg=='threshold') {
     // select global threshold to segment image
     selectWindow(list[i]);
-    setThreshold(0, 160, "black & white");
+    run("Invert LUT");
+    setThreshold(0, 170, "black & white");
     run("Convert to Mask");
+    run("Invert");
     }
 
   if (seg=='difference image') {

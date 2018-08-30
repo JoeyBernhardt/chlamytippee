@@ -258,3 +258,45 @@ all_plates <- map_df(RFU_files, read_excel, skip = 47, .id = "file_name") %>%
 plate1 <- all_plates %>% 
 	filter(grepl("plate1", file_name)) %>% 
 	select(-file_name)
+
+
+
+
+# bring in 96 well plate pilot --------------------------------------------
+
+aug_28 <- read_excel("data/RFU-96-well-pilot/RFU-2018-08-28-96well-growth-pilot.xlsx", skip = 50) %>% 
+	select(-X__2) %>% 
+	rename(row = X__1)
+write_csv(aug_28, "data-processed/96well-growth-pilot-aug28.csv")
+
+aug_29 <- read_excel("data/RFU-96-well-pilot/RFU-2018-08-29-96well-growth-pilot.xlsx", skip = 50) %>% 
+	select(-X__2) %>% 
+	rename(row = X__1)
+write_csv(aug_29, "data-processed/96well-growth-pilot-aug29.csv")
+
+
+aug_28_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug28.csv", well_ids_column = "well") %>% 
+	mutate(plate = "plate1") %>% 
+	rename(RFU = row) %>% 
+	mutate(date = ymd("2018-08-28"))
+
+aug_29_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug29.csv", well_ids_column = "well") %>% 
+	mutate(plate = "plate1") %>% 
+	rename(RFU = row) %>% 
+	mutate(date = ymd("2018-08-29"))
+
+all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU) %>% 
+	mutate(volume = ifelse(grepl("D|G", well), 200, 100)) %>% 
+	mutate(volume = factor(volume)) %>% 
+	filter(!well %in% c("H04", "H05", "H06", "H07", "H08", "H09", "H10", "H11", "H12"))
+
+all_growth_pilot %>% 
+	ggplot(aes(x = date, y = RFU, color = volume, group = well)) + geom_point() +
+	facet_wrap( ~ volume) + geom_line() + scale_color_viridis_d(end = 0.5)
+
+
+
+
+
+
+
