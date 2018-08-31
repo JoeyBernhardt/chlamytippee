@@ -126,12 +126,23 @@ dens_sum_m <- densities %>%
 	summarise_each(funs(mean), Count) 
 
 
+
+
 dens_sum2 <- left_join(dens_sum, plate_pilot, by = "well")
 dens_sum3 <- left_join(dens_sum2, dilutions, by = "population_density")
 
-slopes <- dens_sum3 %>% 
+
+write_csv(dens_sum3, "data-processed/96-well-cell-counts.csv")
+
+innoc_dens <- read_csv("data-processed/ct-pilot-innoc-cell-counts.csv") %>% 
+	mutate(day = "day0")
+
+all_counts <- left_join(dens_sum3, innoc_dens, by = "well")
+slopes <- all_counts %>% 
 	ungroup() %>% 
-	mutate(days = ifelse(day == "day4", 4, 2)) %>% 
+	mutate(days = case_when(day == "day4" ~ 4,
+							day == "day0" ~ 0,
+							day == "day2" ~ 2)) %>% 
 	mutate(light_level = as.numeric(light_level)) %>% 
 	mutate(light_photons = 700*(light_level/100)) %>% 
 	group_by(light_photons, percent_of_stock) %>% 
