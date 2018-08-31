@@ -158,10 +158,13 @@ RFU_all2 <- left_join(RFU_all, dilutions, by = "population_density") %>%
 	mutate(light_photons = light/100*700)
 write_csv(RFU_all2, "data-processed/rfu-day2-4.csv")
 
+RFU_all2 <- read_csv("data-processed/rfu-day2-4.csv")
 
 RFU_all2 %>% 
-	ggplot(aes(x = percent_of_stock, y = RFU, color = factor(date))) + geom_point() +
-	facet_wrap( ~ light)
+	ggplot(aes(x = date, y = RFU, color = percent_of_stock)) + geom_point() +
+	facet_wrap( ~ percent_of_stock) + geom_smooth(method = "lm")
+
+
 
 ggplot(data = RFU_all2, aes(x=light_photons, y=percent_of_stock, color = RFU)) + 
 	geom_point(shape = 15, size = 10) + scale_color_viridis_c() +
@@ -279,6 +282,11 @@ aug_30 <- read_excel("data/RFU-96-well-pilot/RFU-2018-08-30-96well-growth-pilot.
 	rename(row = X__1)
 write_csv(aug_30, "data-processed/96well-growth-pilot-aug30.csv")
 
+aug_31 <- read_excel("data/RFU-96-well-pilot/RFU-2018-08-31-96well-growth-pilot.xlsx", skip = 50) %>% 
+	select(-X__2) %>% 
+	rename(row = X__1)
+write_csv(aug_31, "data-processed/96well-growth-pilot-aug31.csv")
+
 
 aug_28_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug28.csv", well_ids_column = "well") %>% 
 	mutate(plate = "plate1") %>% 
@@ -296,7 +304,12 @@ aug_30_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug30.csv", 
 	rename(RFU = row) %>% 
 	mutate(date = ymd("2018-08-30"))
 
-all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU) %>% 
+aug_31_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug31.csv", well_ids_column = "well") %>% 
+	mutate(plate = "plate1") %>% 
+	rename(RFU = row) %>% 
+	mutate(date = ymd("2018-08-31"))
+
+all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU, aug_31_RFU) %>% 
 	mutate(volume = ifelse(grepl("D|G", well), 200, 100)) %>% 
 	mutate(volume = factor(volume)) %>% 
 	filter(!well %in% c("H04", "H05", "H06", "H07", "H08", "H09", "H10", "H11", "H12"))
@@ -304,7 +317,7 @@ all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU) %>%
 all_growth_pilot %>% 
 	ggplot(aes(x = date, y = RFU, color = volume, group = well)) + geom_point() +
 	facet_wrap( ~ volume) + geom_line() + scale_color_viridis_d(end = 0.5)
-ggsave("figures/96-well-pilot-RFU.pdf", width = 8, height = 5)
+ggsave("figures/96-well-pilot-RFU.pdf", width = 9, height = 5)
 
 
 

@@ -138,13 +138,24 @@ innoc_dens <- read_csv("data-processed/ct-pilot-innoc-cell-counts.csv") %>%
 	mutate(day = "day0")
 
 all_counts <- left_join(dens_sum3, innoc_dens, by = "well")
-slopes <- all_counts %>% 
+
+innoc_densities_long <- all_counts %>% 
+	select(well, cell_count_per_ml_mean, percent_of_stock.x) %>% 
+	mutate(day = "day0") %>% 
+	rename(percent_of_stock = percent_of_stock.x) %>% 
+	rename(cell_count = cell_count_per_ml_mean)
+
+
+all_counts2 <- bind_rows(innoc_densities_long, dens_sum3)
+
+slopes <- all_counts2 %>% 
 	ungroup() %>% 
 	mutate(days = case_when(day == "day4" ~ 4,
 							day == "day0" ~ 0,
 							day == "day2" ~ 2)) %>% 
 	mutate(light_level = as.numeric(light_level)) %>% 
 	mutate(light_photons = 700*(light_level/100)) %>% 
+	mutate(cell_count = ifelse(days == 0, cell_count/3.5, cell_count)) %>% 
 	group_by(light_photons, percent_of_stock) %>% 
 	do(tidy(lm(log(cell_count+1) ~ days, data = .), conf.int = TRUE)) %>% 
 	filter(term == "days") %>% 
@@ -159,14 +170,17 @@ dens_sum3 %>%
 	facet_wrap( ~  percent_of_stock + light_photons, nrow = 8, ncol = 5,  scales = "free") + geom_smooth(method = "lm")
 ggsave("figures/pilot-cell-counts-days2-4.pdf", width = 10, height = 12)
 
-dens_sum3 %>% 
+all_counts2 %>% 
 	ungroup() %>% 
-	mutate(days = ifelse(day == "day4", 4, 2)) %>% 
+	mutate(days = case_when(day == "day4" ~ 4,
+							day == "day0" ~ 0,
+							day == "day2" ~ 2)) %>% 
 	mutate(light_level = as.numeric(light_level)) %>% 
 	mutate(light_photons = 700*(light_level/100)) %>% 
+	mutate(cell_count = ifelse(days == 0, cell_count/3.5, cell_count)) %>% 
 	ggplot(aes(x = days, y = cell_count)) + geom_point() +
 	facet_wrap( ~  percent_of_stock + light_photons, nrow = 8, ncol = 5,  scales = "free") + geom_smooth(method = "lm")
-ggsave("figures/pilot-cell-counts-days2-4-linear.pdf", width = 10, height = 12)
+ggsave("figures/pilot-cell-counts-days0-4-linear.pdf", width = 10, height = 12)
 
 slopes %>% 
 	mutate(growth_rate = ifelse(estimate > 0, "positive", "negative")) %>% 

@@ -70,7 +70,7 @@ innocs4 <- innocs3 %>%
 	mutate(cell_count = ifelse(photo_name == "180822_142908_E3_Phase_10x_(5).jpg", Count, cell_count)) %>% 
 	mutate(cell_count = ifelse(percent_of_stock < 0.2, Count, cell_count)) %>% 
 	group_by(well, percent_of_stock) %>% 
-	mutate(cell_count_per_ml = (cell_count*206.5997)/4*10) %>% 
+	mutate(cell_count_per_ml = (cell_count*206.5997)/4*10*3.5) %>% 
 	summarise_each(funs(mean, std.error), cell_count_per_ml) 
 write_csv(innocs4, "data-processed/ct-pilot-innoc-cell-counts.csv")
 
