@@ -323,7 +323,7 @@ aug_31_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug31.csv", 
 	rename(RFU = row) %>% 
 	mutate(date = ymd("2018-08-31"))
 
-all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU, aug_31_RFU) %>% 
+all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU, aug_31_RFU, sep_03_RFU) %>% 
 	mutate(volume = ifelse(grepl("D|G", well), 200, 100)) %>% 
 	mutate(volume = factor(volume)) %>% 
 	filter(!well %in% c("H04", "H05", "H06", "H07", "H08", "H09", "H10", "H11", "H12"))
@@ -331,7 +331,7 @@ all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU, aug_31_RFU) %>
 all_growth_pilot %>% 
 	ggplot(aes(x = date, y = RFU, color = volume, group = well)) + geom_point() +
 	facet_wrap( ~ volume) + geom_line() + scale_color_viridis_d(end = 0.5)
-ggsave("figures/96-well-pilot-RFU.pdf", width = 9, height = 5)
+ggsave("figures/96-well-pilot-RFU.pdf", width = 10, height = 5)
 
 
 
