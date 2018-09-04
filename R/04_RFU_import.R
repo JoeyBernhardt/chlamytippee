@@ -292,6 +292,11 @@ sep_03 <- read_excel("data/RFU-96-well-pilot/RFU-2018-09-03-96well-growth-pilot.
 	rename(row = X__1)
 write_csv(sep_03, "data-processed/96well-growth-pilot-sep03.csv")
 
+sep_04 <- read_excel("data/RFU-96-well-pilot/RFU-2018-09-04-96well-growth-pilot.xlsx", skip = 50) %>% 
+	select(-X__2) %>% 
+	rename(row = X__1)
+write_csv(sep_04, "data-processed/96well-growth-pilot-sep04.csv")
+
 aug_28_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug28.csv", well_ids_column = "well") %>% 
 	mutate(plate = "plate1") %>% 
 	rename(RFU = row) %>% 
@@ -323,7 +328,12 @@ aug_31_RFU <- read_plate(file = "data-processed/96well-growth-pilot-aug31.csv", 
 	rename(RFU = row) %>% 
 	mutate(date = ymd("2018-08-31"))
 
-all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU, aug_31_RFU, sep_03_RFU) %>% 
+sep_04_RFU <- read_plate(file = "data-processed/96well-growth-pilot-sep04.csv", well_ids_column = "well") %>% 
+	mutate(plate = "plate1") %>% 
+	rename(RFU = row) %>% 
+	mutate(date = ymd("2018-09-04"))
+
+all_growth_pilot <- bind_rows(aug_28_RFU, aug_29_RFU, aug_30_RFU, aug_31_RFU, sep_03_RFU, sep_04_RFU) %>% 
 	mutate(volume = ifelse(grepl("D|G", well), 200, 100)) %>% 
 	mutate(volume = factor(volume)) %>% 
 	filter(!well %in% c("H04", "H05", "H06", "H07", "H08", "H09", "H10", "H11", "H12"))
