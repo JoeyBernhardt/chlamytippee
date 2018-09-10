@@ -417,7 +417,7 @@ all_temp_RFU2 %>%
 	mutate(temperature_celcius = case_when(temperature == 5 ~ "5°C",
 								temperature == 20 ~ "20°C",
 								temperature == 25 ~ "25°C")) %>% 
-	mutate(volume =ifelse(grepl(100, volume), "200 uL", "100 uL")) %>% 
+	mutate(volume =ifelse(grepl(100, volume), "100 uL", "200 uL")) %>% 
 	ggplot(aes(x = date, y = RFU, color = temperature_celcius, group = unique_id)) + geom_point() + geom_line() +
 	facet_wrap( ~ temperature_celcius + treatment+ volume) + scale_color_viridis_d(begin = 0.8, end = 0.1, name = "Temperature (°C)")
 
@@ -429,10 +429,18 @@ all_temp_RFU2 %>%
 	mutate(temperature_celcius = case_when(temperature == 5 ~ "5°C",
 										   temperature == 20 ~ "20°C",
 										   temperature == 25 ~ "25°C")) %>% 
-	mutate(volume =ifelse(grepl(100, volume), "200 uL", "100 uL")) %>% 
+	mutate(volume =ifelse(grepl(100, volume), "100 uL", "200 uL")) %>% 
 	ggplot(aes(x = date, y = RFU, color = volume, group = unique_id)) + geom_point(alpha = 0.5) + geom_line(alpha = 0.5) +
 	facet_wrap( ~ temperature_celcius + treatment) + scale_color_viridis_d(begin = 0.9, end = 0.1, name = "Volume (uL)")
 
 ggsave("figures/temperature-lid-pilot-abundances-20C.pdf", width = 8, height = 5)
+
+
+all_temp_RFU2 %>% 
+	filter(treatment == "lid and breathe-easy") %>% 
+	ggplot(aes(x = date, y = RFU, color = temperature, group = unique_id)) + geom_point() +
+	geom_line() + scale_color_viridis_c() +
+	facet_wrap( ~ volume)
+ggsave("figures/temperature-lid-pilot-abundances-temperatures.pdf", width = 8, height = 5)
  
  
