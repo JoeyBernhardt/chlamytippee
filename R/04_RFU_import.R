@@ -376,7 +376,63 @@ all_growth_pilot %>%
 ggsave("figures/96-well-pilot-RFU.pdf", width = 10, height = 5)
 
 
+# Now bring in the temperature lid pilot ----------------------------------
 
 
 
+RFU_files <- c(list.files("data/temperature-pilot", full.names = TRUE))
 
+RFU_files <- RFU_files[grepl(".xlsx", RFU_files)]
+
+names(RFU_files) <- RFU_files %>% 
+	gsub(pattern = ".xlsx$", replacement = "")
+
+all_plates <- map_df(RFU_files, read_excel, skip = 49, .id = "file_name") %>% 
+	select(-X__2) %>% 
+	rename(row = X__1)
+
+all_temp_RFU <- all_plates %>% 
+	gather(key = column, value = RFU, 3:14) %>% 
+	unite(row, column, col = "well", remove = FALSE, sep = "") %>% 
+	mutate(volume = ifelse(grepl("D|G", well), 200, 100)) %>% 
+	mutate(volume = factor(volume)) 
+
+all_temp_RFU2 <- all_temp_RFU %>% 
+	separate(file_name, into = c("file_path", "date_temp"), sep = "RFU-") %>% 
+	separate(date_temp, into = c("date", "temperature_raw"), sep = 10, remove = FALSE) %>%
+	mutate(temperature = case_when(grepl("05", temperature_raw) ~ 5,
+									grepl("25", temperature_raw) ~ 25,
+									grepl("20", temperature_raw) ~ 20)) %>%
+	mutate(treatment = NA) %>% 
+	mutate(treatment = case_when(grepl("NOBE", temperature_raw) ~ "no breathe-easy",
+								 grepl("NOLID", temperature_raw) ~ "no lid")) %>% 
+	mutate(treatment = ifelse(is.na(treatment), "lid and breathe-easy", treatment)) %>%
+	mutate(date = ymd(date)) %>%
+	filter(!grepl("measurment", temperature_raw)) %>% 
+	mutate(unique_id = paste(well, temperature, treatment, sep = "_"))
+	
+
+all_temp_RFU2 %>%
+	mutate(temperature_celcius = NA) %>% 
+	mutate(temperature_celcius = case_when(temperature == 5 ~ "5°C",
+								temperature == 20 ~ "20°C",
+								temperature == 25 ~ "25°C")) %>% 
+	mutate(volume =ifelse(grepl(100, volume), "200 uL", "100 uL")) %>% 
+	ggplot(aes(x = date, y = RFU, color = temperature_celcius, group = unique_id)) + geom_point() + geom_line() +
+	facet_wrap( ~ temperature_celcius + treatment+ volume) + scale_color_viridis_d(begin = 0.8, end = 0.1, name = "Temperature (°C)")
+
+ggsave("figures/temperature-lid-pilot-abundances.pdf", width = 10, height = 8)
+
+all_temp_RFU2 %>%
+	filter(temperature == 20) %>% 
+	mutate(temperature_celcius = NA) %>% 
+	mutate(temperature_celcius = case_when(temperature == 5 ~ "5°C",
+										   temperature == 20 ~ "20°C",
+										   temperature == 25 ~ "25°C")) %>% 
+	mutate(volume =ifelse(grepl(100, volume), "200 uL", "100 uL")) %>% 
+	ggplot(aes(x = date, y = RFU, color = volume, group = unique_id)) + geom_point(alpha = 0.5) + geom_line(alpha = 0.5) +
+	facet_wrap( ~ temperature_celcius + treatment) + scale_color_viridis_d(begin = 0.9, end = 0.1, name = "Volume (uL)")
+
+ggsave("figures/temperature-lid-pilot-abundances-20C.pdf", width = 8, height = 5)
+ 
+ 
