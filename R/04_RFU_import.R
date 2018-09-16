@@ -440,7 +440,7 @@ all_temp_RFU2 %>%
 	filter(treatment == "lid and breathe-easy") %>% 
 	ggplot(aes(x = date, y = RFU, color = temperature, group = unique_id)) + geom_point() +
 	geom_line() + scale_color_viridis_c() +
-	facet_wrap( ~ volume)
+	facet_wrap( ~ volume + temperature)
 ggsave("figures/temperature-lid-pilot-abundances-temperatures.pdf", width = 8, height = 5)
  
  
